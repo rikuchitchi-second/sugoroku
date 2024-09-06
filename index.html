@@ -1,1 +1,308 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>すごろく</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+        }
+
+        .start-screen {
+            text-align: center;
+        }
+
+        .start-button {
+            padding: 15px 30px;
+            font-size: 20px;
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .start-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(5, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+            margin-bottom: 20px;
+            display: none; /* 初期状態では非表示 */
+        }
+
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #000;
+            background-color: #f0f0f0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .start {
+            background-color: #a0e0a0;
+        }
+
+        .goal {
+            background-color: #e0a0a0;
+        }
+
+        .piece {
+            width: 50px;
+            height: 50px;
+            background-color: #0000ff;
+            border-radius: 50%;
+        }
+
+        .cb01 {
+            position: relative;
+            transform-style: preserve-3d;
+            width: 150px;
+            height: 150px;
+            left: 75px;
+            transition: 1.6s;
+            transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+        }
+
+        .cb01 div {
+            position: absolute;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            border-radius: 5px;
+            border: 3px solid #ddddddc0;
+            background-color: #ffffff;
+        }
+
+        .cbs1 {
+            background-image: radial-gradient(circle at 50% 50%, #ff0000ff 19%, #ff000000 20%);
+            transform: translateZ(75px);
+        }
+
+        .cbs2 {
+            background-image: radial-gradient(circle at 75% 25%, #000000ff 10%, #00000000 11%), radial-gradient(circle at 25% 75%, #000000ff 10%, #00000000 11%);
+            transform: rotateY(90deg) translateZ(75px);
+        }
+
+        .cbs3 {
+            background-image: radial-gradient(circle at 75% 25%, #000000ff 10%, #00000000 11%), radial-gradient(circle at 50% 50%, #000000ff 15%, #00000000 16%), radial-gradient(circle at 25% 75%, #000000ff 10%, #00000000 11%);
+            transform: rotateX(90deg) translateZ(75px);
+        }
+
+        .cbs4 {
+            background-image: radial-gradient(circle at 25% 25%, #000000ff 10%, #00000000 11%), radial-gradient(circle at 25% 75%, #000000ff 10%, #00000000 11%), radial-gradient(circle at 75% 25%, #000000ff 10%, #00000000 11%), radial-gradient(circle at 75% 75%, #000000ff 10%, #00000000 11%);
+            transform: rotateX(-90deg) translateZ(75px);
+        }
+
+        .cbs5 {
+            background-image: radial-gradient(circle at 25% 25%, #000000ff 10%, #00000000 11%), radial-gradient(circle at 25% 75%, #000000ff 10%, #00000000 11%), radial-gradient(circle at 50% 50%, #000000ff 15%, #00000000 16%), radial-gradient(circle at 75% 25%, #000000ff 10%, #00000000 11%), radial-gradient(circle at 75% 75%, #000000ff 10%, #00000000 11%);
+            transform: rotateY(-90deg) translateZ(75px);
+        }
+
+        .cbs6 {
+            background-image: radial-gradient(circle at 25% 25%, #000000ff 10%, #00000000 11%), radial-gradient(circle at 25% 50%, #000000ff 12%, #00000000 13%), radial-gradient(circle at 25% 75%, #000000ff 10%, #00000000 11%), radial-gradient(circle at 75% 25%, #000000ff 10%, #00000000 11%), radial-gradient(circle at 75% 50%, #000000ff 12%, #00000000 13%), radial-gradient(circle at 75% 75%, #000000ff 10%, #00000000 11%);
+            transform: rotateY(180deg) translateZ(75px);
+        }
+
+        .button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            left: 100px; /* ここでボタンを20px右に移動 */
+        }
+
+        .button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="start-screen">
+        <h1>すごろくゲーム</h1>
+        <button id="startButton" class="start-button">すごろくで遊ぶ</button>
+    </div>
+    <div class="board">
+        <div class="cell start">スタート</div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell goal">ゴール</div>
+    </div>
+    <div id="cbid" class="cb01">
+        <div class="cbs1"></div>
+        <div class="cbs2"></div>
+        <div class="cbs3"></div>
+        <div class="cbs4"></div>
+        <div class="cbs5"></div>
+        <div class="cbs6"></div>
+    </div>
+    <button id="rollButton" class="button" style="display: none;">サイコロを振る</button>
+    <script>
+    // 現在の回転角度を保持する変数
+    let currentRotationX = 0;
+    let currentRotationY = 0;
+    let currentRotationZ = 0;
+
+    // 駒の位置を保持する変数
+    let currentPosition = 0;
+
+    // サイコロを振るボタンの取得
+    const rollButton = document.getElementById('rollButton');
+    const dice = document.getElementById('cbid');
+
+    // スタートボタンの取得
+    const startButton = document.getElementById('startButton');
+    const startScreen = document.querySelector('.start-screen');
+    const board = document.querySelector('.board');
+
+    startButton.addEventListener('click', function() {
+        startScreen.style.display = 'none';
+        board.style.display = 'grid';
+        rollButton.style.display = 'inline-block';
+    });
+
+    rollButton.addEventListener('click', function() {
+        // ボタンを非表示にする
+        rollButton.disabled = true;
+
+        // 乱数を生成してサイコロの目を決定
+        let diceFace = Math.floor(Math.random() * 6) + 1;
+        console.log("出た目: " + diceFace);
+
+        // サイコロの目に対応する回転角度を設定
+        let targetRotationX = 0;
+        let targetRotationY = 0;
+        let targetRotationZ = 0;
+
+        switch (diceFace) {
+            case 1:
+                targetRotationX = 0;
+                targetRotationY = 0;
+                targetRotationZ = 0;
+                break;
+            case 2:
+                targetRotationX = 0;
+                targetRotationY = -90;
+                targetRotationZ = 0;
+                break;
+            case 3:
+                targetRotationX = -90;
+                targetRotationY = 0;
+                targetRotationZ = 0;
+                break;
+            case 4:
+                targetRotationX = 90;
+                targetRotationY = 0;
+                targetRotationZ = 0;
+                break;
+            case 5:
+                targetRotationX = 0;
+                targetRotationY = 90;
+                targetRotationZ = 0;
+                break;
+            case 6:
+                targetRotationX = 0;
+                targetRotationY = 180;
+                targetRotationZ = 0;
+                break;
+        }
+
+        // 全ての可能な回転ルートを計算
+        let routes = [
+            { x: targetRotationX, y: targetRotationY, z: targetRotationZ },
+            { x: targetRotationX + 360, y: targetRotationY, z: targetRotationZ },
+            { x: targetRotationX - 360, y: targetRotationY, z: targetRotationZ },
+            { x: targetRotationX, y: targetRotationY + 360, z: targetRotationZ },
+            { x: targetRotationX, y: targetRotationY - 360, z: targetRotationZ },
+            { x: targetRotationX, y: targetRotationY, z: targetRotationZ + 360 },
+            { x: targetRotationX, y: targetRotationY, z: targetRotationZ - 360 },
+        ];
+
+        // ルートを距離でソート
+        routes.sort((a, b) => {
+            let distanceA = Math.abs(a.x - currentRotationX) + Math.abs(a.y - currentRotationY) + Math.abs(a.z - currentRotationZ);
+            let distanceB = Math.abs(b.x - currentRotationX) + Math.abs(b.y - currentRotationY) + Math.abs(b.z - currentRotationZ);
+            return distanceA - distanceB;
+        });
+
+        // 6番目に短いルートを選択
+        let selectedRoute = routes[5];
+
+        // transform プロパティの値を更新
+        dice.style.transform = `rotateX(${selectedRoute.x}deg) rotateY(${selectedRoute.y}deg) rotateZ(${selectedRoute.z}deg)`;
+
+        // 現在の回転角度を更新
+        currentRotationX = selectedRoute.x;
+        currentRotationY = selectedRoute.y;
+        currentRotationZ = selectedRoute.z;
+
+        // transitionend イベントを利用して駒の移動を待機
+        dice.addEventListener('transitionend', function handleTransitionEnd() {
+            // イベントリスナーを削除
+            dice.removeEventListener('transitionend', handleTransitionEnd);
+
+            // 駒を進める
+            movePiece(diceFace);
+
+            // ボタンを再表示する
+            rollButton.disabled = false;
+        });
+    });
+
+    function movePiece(steps) {
+        currentPosition += steps;
+        if (currentPosition >= 14) {
+            currentPosition = 13; // ゴールを超えないようにする
+        }
+
+        // 駒の位置を更新
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach(cell => {
+            // スタートマスやゴールマスのテキストを保持
+            if (cell.classList.contains('start')) {
+                cell.innerHTML = 'スタート';
+            } else if (cell.classList.contains('goal')) {
+                cell.innerHTML = 'ゴール';
+            } else {
+                cell.innerHTML = ''; // 他のセルをクリア
+            }
+        });
+        cells[currentPosition].innerHTML = '<div class="piece"></div>'; // 新しい位置に駒を配置
+    }
+
+    // 初期位置に駒を配置
+    document.querySelector('.start').innerHTML = '<div class="piece"></div>';
+    </script>
+</body>
+</html>
 
